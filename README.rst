@@ -6,7 +6,7 @@ Kodi.R has a lot of functions, and many of their names are short and cryptic. So
     for (name in c("qw", "ordf", "tversky.sid", "unpack.tversky"))
         assign(name, Kodi[[name]])
 
-Put ``options(Kodi.R.path = "/path/to/Kodi.R)`` in your own .Rprofile.
+Put ``options(Kodi.R.path = "/path/to/Kodi.R")`` in your own .Rprofile.
 
 License
 ============================================================
