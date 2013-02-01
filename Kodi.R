@@ -241,6 +241,10 @@ mean.dmax = function(drop, v)
 # Mean of 'v' dropping the 'drop' greatest elements.
     mean( sort(v, dec = T)[-(1 : drop)] )
 
+qmean = function(v)
+   {qs = as.vector(quantile(v, c(.025, .975)))
+    c(lo = qs[1], mean = mean(v), hi = qs[2])}
+
 mad1 = function(v, na.rm = FALSE)
     mad(v, na.rm, constant = 1)
 
