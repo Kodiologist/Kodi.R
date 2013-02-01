@@ -969,7 +969,7 @@ org.write.table = function(x, na = "NA", ...)
     else if (inherits(x, "gelman.diag"))
       {x = round(digits = 2, x$psrf[, "Upper C.I.", drop = F])
        dimnames(x)[[1]] = sprintf("`%s`", dimnames(x)[[1]])
-       utils::write.table(x, na = "", ...)}
+       utils::write.table(format(x, drop0trailing = F), na = "", ...)}
     else if ((is.numeric(x) || is.factor(x)) && (is.null(dim(x)) || length(dim(x)) == 1))
        utils::write.table(
            if (is.null(names(x)))
@@ -979,7 +979,7 @@ org.write.table = function(x, na = "NA", ...)
               data.frame(value = x),
            na = na,
            ...)
-    else if (inherits(x, "data.frame"))
+    else if (inherits(x, "data.frame") || inherits(x, "matrix"))
        utils::write.table(format(x, drop0trailing = F), na = "", ...)
     else
        utils::write.table(x, na = "", ...)}
