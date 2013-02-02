@@ -895,6 +895,34 @@ unpack.tversky = function(db.path,
         timing = timing,
         tdiff = tdiff)}
 
+tversky.mortality = function(db.path)
+# Makes a data frame that gives the last timing key for each
+# subject. (Subjects who have no entires in the timing table
+# get the key "NONE".)
+   {l = unpack.tversky(db.path, include.incomplete = T)
+
+    # First we jump through a lot of hoops to determine a good
+    # order of levels for 'k'.
+    klv = plyr::ddply(l$timing, plyr::.(s), function (slice)
+        transform(slice, pos = seq(0, 1, len = nrow(slice))))
+    klv = plyr::ddply(klv, plyr::.(k), function(slice) data.frame(
+        first_sent = min(slice$first_sent),
+        pos = mean(slice$pos)))
+    klv = char(ordf(klv, pos, first_sent)$k)
+
+    d = plyr::ddply(l$timing, plyr::.(s), function (slice)
+       with(slice[which.max(slice$first_sent),],
+          data.frame(k, time = posix.ct(first_sent))))
+    row.names(d) = d$s
+    d = transform(d[c("k", "time")], k = factor(k,
+        levels = c("NONE", intersect(klv, char(k)))))
+    d = rbind(d, with(l$subjects[setdiff(row.names(l$subjects), row.names(d)),],
+        data.frame(
+            row.names = s,
+            k = "NONE",
+            time = posix.ct(ifna(began_t, consented_t)))))
+    sort.df(d)}
+
 # --------------------------------------------------
 # ksource
 # --------------------------------------------------
