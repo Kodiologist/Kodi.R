@@ -52,6 +52,12 @@ setup.cluster = function()
 # Metaprogramming
 # --------------------------------------------------
 
+ccall = function(x, ...)
+# Concatenate ... on to the end of the call 'x'.
+#   ccall(as.call(list(quote(f), quote(a), quote(b))), quote(c)) =>
+#   f(a, b, c)
+   {as.call(c(as.list(x), ...))}
+
 splice.into.expr = function(expr, l)
 # Similar to `substitute`, but substitutions of curly-delimited
 # blocks are spliced into the outer construct. Also, the arguments
