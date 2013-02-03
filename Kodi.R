@@ -555,7 +555,7 @@ plotfuns = function(fs, xrange, yrange, n = 101)
         data.frame(f = i, x = xx, y = fs[[i]](xx))))
     d$f = factor(d$f)
     qplot(xrange, yrange, geom = "blank") +
-        geom_line(aes(xx, y, color = f), data = d) +
+        geom_line(aes(x, y, color = f), data = d) +
         scale_color_hue(l = 30) +
         scale_x_continuous(name = "", expand = c(0, 0)) +
         scale_y_continuous(name = "", expand = c(0, 0)) +
