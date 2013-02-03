@@ -1,3 +1,4 @@
+library(stats4)
 library(R.cache)
 library(ggplot2)
 library(grid) # For "unit"
@@ -128,7 +129,7 @@ env.chain = function(e)
 
 copy.env = function(e, parent = parent.env(e))
    {new = list2env(as.list(e, all.names = T), parent = parent)
-    attr(new, "name") = attr(e, "name")
+    attributes(new) = attributes(e)
     new}
 
 # --------------------------------------------------
@@ -618,6 +619,53 @@ dodge.offsets.continuous = function(x, y, faceter, xincr, ytol)
                         done(x)
                 xo = xo + xincr})}
         cbind(df, x = df$x, faceter = df$faceter, xoff)})
+
+stat_densitybw = function(..., bw = "nrd0")
+# Like 'stat_density', but permits a 'bw' argument for 'density'.
+    density.addbw(stat_density(...), bw)
+
+geom_densitybw = function(..., bw = "nrd0")
+# Like 'geom_density', but permits a 'bw' argument for 'density'.
+    density.addbw(geom_density(...), bw)
+
+density.addbw = function(x, bw)
+   {x$stat = copy.env(x$stat)
+    e = copy.env(environment(x$stat$calculate))
+    e$density.default = stats::density.default
+    formals(e$density.default)$bw = bw
+    environment(x$stat$calculate) = e
+    x}
+
+compare.mle = function(x, f, start, fixed = punl(), xlim)
+# Examples:
+#   plot.mle(rnorm(100), dnorm, list(mean = 0, sd = 1), xlim = c(-3, 3))
+#   plot.mle(rbeta(100, 10, 2), dbeta, list(shape1 = 1, shape2 = 1), xlim = c(0, 1))
+# The first argument of 'f' must be the data argument (where you'd
+# plug in 'x').
+   {# Construct 'fit.f'.
+    fit.f = function() -sum(X)
+    formals(fit.f) = formals(f)[-1]
+    if ("log" %in% names(formals(f)))
+       {formals(fit.f)$log = T}
+    else
+       {body(fit.f) = splice.into.expr(body(fit.f), list(
+            X = quote(log(X))))}
+    body(fit.f) = splice.into.expr(body(fit.f), list(
+        X = as.call(c(list(quote(f)),
+            c(list(quote(x)), lapply(names(formals(f)), as.name)[-1])))))
+
+    # Compute and print the MLEs.
+    fit = suppressWarnings(mle(fit.f,
+        start = start, fixed = fixed, nobs = length(x)))
+    arg = as.list(coef(fit))
+    arg$log = c()
+    print(c(simplify2array(arg), LL = logLik(fit)))
+
+    # Plot the data with the density function given by the MLEs.
+    ggplot(data.frame(x = x)) +
+        geom_densitybw(aes(x), bw = "SJ") +
+        stat_function(fun = f, arg = arg, color = "blue") +
+        scale_x_continuous(limits = xlim, expand = c(0, 0))}
 
 # --------------------------------------------------
 # MCMC
