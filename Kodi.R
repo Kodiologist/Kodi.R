@@ -740,18 +740,11 @@ multijags = function(
         n.adapt = 1000, n.nonadapt = 0,
         n.sample = 1000 * thin, thin = 1,
         jags.sample.monitor = character(), jags.sample.n = 250,
-        parallel = T, quiet = F,
-        bypass.cache = F, cache.key = punl(model.code, n.adapt, n.nonadapt, n.sample))
+        parallel = T, quiet = F)
    {if (!is.list(inits) || !is.list(inits[[1]]))
         stop("inits is not a list of lists")
     if (!is.character(model.code) || length(model.code) != 1)
         stop("model.code is not a string")
-
-    cache.dirs = qw(Kodi, multijags)
-    if (!bypass.cache)
-       {result = loadCache(cache.key, dirs = cache.dirs)
-        if (!is.null(result))
-            return(result)}
 
     n.chains = length(inits)
     load.module("lecuyer")
@@ -762,7 +755,7 @@ multijags = function(
     model.file = tempfile()
     writeLines(model.code, model.file)
 
-    result = tryCatch(finally = unlink(model.file),
+    tryCatch(finally = unlink(model.file),
        {if (parallel)
            {results = foreach::foreach(i = 1 : n.chains) %dopar%
                # We show progress bars only for chain 1.
@@ -815,9 +808,7 @@ multijags = function(
             samp = coda.samples(jags, variable.names = monitor,
                 n.iter = n.sample, thin = thin,
                 progress.bar = ifelse(quiet, "none", "text"))
-            list(data = data, samp = samp)}})
-    saveCache(result, cache.key, dirs = cache.dirs)
-    result}
+            list(data = data, samp = samp)}})}
 
 coda.vars = function(samp, str)
 # 'coda.vars(samp, "rho")' gets all the parameter names in the
