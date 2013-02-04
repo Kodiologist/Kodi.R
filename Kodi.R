@@ -107,6 +107,55 @@ splice.into.expr = function(expr, l)
     else
        expr}
 
+defmacroq = function(..., expr)
+# 'gtools::defmacro' (2.7.0, LGPL 2.1), but the final constructed
+# expression is returned in quoted form instead of evaluated.
+# It's useful inside 'bquote'.
+{
+  expr <- substitute(expr)
+  a <- substitute(list(...))[-1]
+
+  ## process the argument list
+  nn <- names(a)
+  if (is.null(nn))
+    nn <- rep("", length(a))
+  for(i in 1:length(a))
+    {
+      if (nn[i] == "")
+        {
+          nn[i] <- paste(a[[i]])
+          msg <- paste(a[[i]], "not supplied")
+          a[[i]] <- substitute(stop(foo),
+                               list(foo = msg))
+        }
+      if (nn[i] == "DOTS")
+        {
+          nn[i] <- "..."
+          a[[i]] <- formals(function(...){})[[1]]
+        }
+    }
+  names(a) <- nn
+  a <- as.list(a)
+
+  ## this is where the work is done
+  ff <- eval(substitute(
+                        function() substitute(body),
+                        list(body = expr)))
+
+  ## add the argument list
+  formals(ff) <- a
+
+  ## create a fake source attribute
+  mm <- match.call()
+  mm$expr <- NULL
+  mm[[1]] <- as.name("macro")
+  attr(ff, "source") <- c(deparse(mm),
+                          deparse(expr))
+
+  ## return the 'macro'
+  ff
+}
+
 # --------------------------------------------------
 # Functions
 # --------------------------------------------------
