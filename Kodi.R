@@ -1115,7 +1115,8 @@ default.cache.dirs = c("Kodi", "adhoc")
 cache = function(cache.key, v, cache.dirs = default.cache.dirs, comment = NULL)
    {cached.v = loadCache(cache.key, dirs = cache.dirs)
     if (is.null(cached.v))
-       {saveCache.default(v, cache.key, dirs = cache.dirs,
+       {force(v)
+        saveCache.default(v, cache.key, dirs = cache.dirs,
             comment = comment)
         v}
     else
