@@ -412,7 +412,8 @@ groups = function(v)
 modlevels = function(x, ...)
 # modlevels(x, A = "B", Q = c("foo", "bar"), .NA = "baz")) renames
 # levels "B", "foo", "bar", and "baz" without touching other levels.
-   {old = levels(x)
+   {x = as.factor(x)
+    old = levels(x)
     l = list(...)
     replaced = as.vector(c(l, recursive = T))
     old = old[!(old %in% replaced)]
