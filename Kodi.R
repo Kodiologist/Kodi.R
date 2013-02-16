@@ -196,6 +196,15 @@ which.new = function(v)
 # c(1, 4, 7, 9)
    c(1, which(c(v, NA) != c(NA, v)))
 
+which.idx = function(whence, v)
+# which.idx(letters, c("o", "x"))
+#  => c(o = 15L, x = 24L)
+  {if (inherits(v, "character"))
+      {whence = `names<-`(seq_along(whence), whence)
+       whence[v]}
+   else
+      stop("non-character v not implemented")}
+
 pick = function(v, size = 1, ...)
 # Like sample, but without surprising behavior when length(v) == 1
 # and with size defaulting to 1.
@@ -422,6 +431,17 @@ modlevels = function(x, ...)
     `levels<-`(x, c(
         structure(as.list(old), .Names = old),
         l))}
+
+ordlevels = function(v, ...)
+# Reorder the levels of a factor. In the ... expression,
+# 'V' is available as the original levels.
+#   ordlevels(InsectSprays$spray, daply(InsectSprays, .(spray),
+#        function(slice) mean(slice$count))[V])
+#   => factor(…, levels = c("C", "E", "D", "A", "B", "F"))
+   {pf = parent.frame()
+    e = new.env(parent = pf)
+    e$V = levels(v)
+    factor(v, levels = e$V[eval(envir = e, substitute(order(...)))])}
 
 fframe = function(...)
 # fframe(c("a", "b", "c", "b"), c("q", "c", "p"), c("q", "r"))
