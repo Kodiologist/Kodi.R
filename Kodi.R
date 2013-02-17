@@ -693,11 +693,11 @@ dodge.offsets.continuous = function(x, y, faceter, xincr, ytol)
                 xo = xo + xincr})}
         cbind(df, x = df$x, faceter = df$faceter, xoff)})
 
-stat_densitybw = function(..., bw = "nrd0")
+stat_densitybw = function(..., bw = "SJ")
 # Like 'stat_density', but permits a 'bw' argument for 'density'.
     density.addbw(stat_density(...), bw)
 
-geom_densitybw = function(..., bw = "nrd0")
+geom_densitybw = function(..., bw = "SJ")
 # Like 'geom_density', but permits a 'bw' argument for 'density'.
     density.addbw(geom_density(...), bw)
 
@@ -736,7 +736,7 @@ compare.mle = function(x, f, start, fixed = punl(), xlim)
 
     # Plot the data with the density function given by the MLEs.
     ggplot(data.frame(x = x)) +
-        geom_densitybw(aes(x), bw = "SJ") +
+        geom_densitybw(aes(x)) +
         stat_function(fun = f, arg = arg, color = "blue") +
         scale_x_continuous(limits = xlim, expand = c(0, 0))}
 
