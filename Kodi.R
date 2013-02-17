@@ -1135,11 +1135,12 @@ org.write.table = function(x, na = "NA", ...)
        utils::write.table(format(x, drop0trailing = F), na = "", ...)}
     else if ((is.numeric(x) || is.factor(x)) && (is.null(dim(x)) || length(dim(x)) == 1))
        utils::write.table(
-           if (is.null(names(x)))
-              data.frame(row.names = "",
-                  value = paste(x, collapse = " "))
-           else
-              data.frame(value = x),
+           format(drop0trailing = F,
+               if (is.null(names(x)))
+                  data.frame(row.names = "",
+                      value = paste(x, collapse = " "))
+               else
+                  data.frame(value = x)),
            na = na,
            ...)
     else if (inherits(x, "data.frame") || inherits(x, "matrix"))
