@@ -342,6 +342,9 @@ rnorm.f = function(n, mean = 0, sd = 1)
     {v = rnorm(n)
      (v - mean(v)) / sd(v) * sd + mean}
 
+rbeta.munu = rbeta.munu = function(n, mu, nu)
+    rbeta(n, mu * nu, (1 - mu) * nu)
+
 modes = function(x, all = FALSE, ...)
 # http://r.789695.n4.nabble.com/Statistical-mode-td3553534.html
 {
@@ -754,6 +757,9 @@ as.bugs.model = function(expr, ...)
    "model " %.% paste(collapse = "\n", deparse(
        splice.into.expr(m$expr, list(...))))}
 
+dbeta.munu = defmacroq(mu, nu, expr =
+    dbeta(mu * nu, (1 - mu) * nu))
+
 std.jags.rngs = c("base::Wichmann-Hill", "base::Marsaglia-Multicarry", "base::Super-Duper", "base::Mersenne-Twister")
 multijags = function(
         model.code,
@@ -830,6 +836,16 @@ multijags = function(
                 n.iter = n.sample, thin = thin,
                 progress.bar = ifelse(quiet, "none", "text"))
             list(data = data, samp = samp)}})}
+
+coda.qmean = function(mcmc.list, true.vals = NULL)
+  {m = signif(digits = 3, mapcols(
+       do.call(rbind, mcmc.list), qmean))
+   if (!is.null(true.vals))
+      {m = rbind(
+           m[c("hi", "mean"),],
+           true = as.numeric(true.vals[dimnames(m)[[2]]]),
+           m["lo",, drop = F])}
+   as.data.frame(m)}
 
 coda.vars = function(samp, str)
 # 'coda.vars(samp, "rho")' gets all the parameter names in the
