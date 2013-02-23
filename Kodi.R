@@ -652,7 +652,8 @@ dodge = function(x, y, faceter = NULL, data = NULL, discrete = F)
         geom_point(aes(
             x = as.numeric(x) + xoff,
             y = if (discrete) y + yoff else y)) +
-        xlab(m$x) + ylab(m$y)
+        xlab(m$x) + ylab(m$y) +
+        theme(panel.grid.major.x = element_blank())
     if (length(faceter) > 1) p = p +
         facet_grid(. ~ faceter)
     if (discrete) p = p +
