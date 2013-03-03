@@ -266,6 +266,8 @@ ucfirst = function(s)
 # Numbers
 # --------------------------------------------------
 
+bool = as.logical
+int = as.integer
 num = as.numeric
 
 div1 = function(v, n)
