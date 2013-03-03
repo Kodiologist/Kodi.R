@@ -1123,6 +1123,15 @@ ksource.library = function(e) function(libname)
         parent.env(e) = pkg}
     T}
 
+kenv = function(pattern)
+# A shortcut for getting ksource.envs at the command line.
+   {ename = grep(pattern, names(ksource.envs))
+    if (length(ename) == 0)
+       stop("No match")
+    if (length(ename) > 1)
+       stop("Ambiguous pattern")
+    ksource.envs[[ename]]}
+
 # --------------------------------------------------
 # Org
 # --------------------------------------------------
