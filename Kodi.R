@@ -1172,7 +1172,7 @@ cache = function(cache.key, v, cache.dirs = default.cache.dirs, comment = NULL)
     else
        cached.v}
 
-cached = function(cache.dirs = default.cache.dirs) function(v)
+mk.cached = function(cache.dirs = default.cache.dirs) function(v)
    {m = match.call()
     expr.str = paste(deparse(m$v), collapse = " ")
     cache(list(expr = expr.str), v, cache.dirs,
