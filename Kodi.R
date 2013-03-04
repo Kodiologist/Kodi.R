@@ -600,6 +600,11 @@ no.gridlines = function() theme(
     panel.grid.major = element_blank(),
     panel.grid.minor = element_blank())
 
+inset.legend = function(p = c(0, 1)) theme(
+    legend.position = p,
+    legend.justification = p,
+    legend.background = element_rect(color = "black"))
+
 ksyc = function(...) # Shorthand for scale_y_continuous(expand = c(0, 0), ...)
    {m = match.call(expand.dots = F)
     do.call(scale_y_continuous, args =
