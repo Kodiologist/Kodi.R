@@ -1167,9 +1167,9 @@ org.write.table = function(x, na = "NA", ...)
 
 default.cache.dirs = c("Kodi", "adhoc")
 
-cache = function(cache.key, v, cache.dirs = default.cache.dirs, comment = NULL)
+cache = function(cache.key, v, cache.dirs = default.cache.dirs, comment = NULL, bypass = F)
    {cached.v = loadCache(cache.key, dirs = cache.dirs)
-    if (is.null(cached.v))
+    if (bypass || is.null(cached.v))
        {force(v)
         saveCache.default(v, cache.key, dirs = cache.dirs,
             comment = comment)
@@ -1177,10 +1177,14 @@ cache = function(cache.key, v, cache.dirs = default.cache.dirs, comment = NULL)
     else
        cached.v}
 
-mk.cached = function(cache.dirs = default.cache.dirs) function(v)
+mk.cached = function(cache.dirs = default.cache.dirs) function(v, override = NULL)
    {m = match.call()
     expr.str = paste(deparse(m$v), collapse = " ")
-    cache(list(expr = expr.str), v, cache.dirs,
+    cache(
+        cache.key = list(expr = expr.str),
+        v = if (!is.null(override)) override else v,
+        bypass = !is.null(override),
+        cache.dirs = cache.dirs,
         comment = paste("expr:", expr.str))}
 
 kodi.eval = function(expr, ename)
