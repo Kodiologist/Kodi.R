@@ -1181,8 +1181,10 @@ org.write.table = function(x, na = "NA", ...)
                   data.frame(value = x)),
            na = na,
            ...)
-    else if (inherits(x, "data.frame") || inherits(x, "matrix"))
-       utils::write.table(format(x, drop0trailing = F), na = "", ...)
+    else if (is.data.frame(x) || is.matrix(x))
+      {t = format(x, drop0trailing = F)
+       t[is.na(x)] = ""
+       utils::write.table(t, ...)}
     else
        utils::write.table(x, na = "", ...)}
 
