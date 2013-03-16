@@ -397,6 +397,27 @@ normal.between = function(a, b, p)
         mean = mean(c(a, b)),
         sd = (b - a)/2/abs(qnorm((1 - p)/2)))
 
+boot.ranks = function(y, g, data = NULL, n.replicates = 1e4, f = mean)
+# For each group of 'y', computes the bootstrapped confidence
+# that some function 'f' of that group is greater than that of
+# each other group. Example:
+#   boot.ranks(count, spray, InsectSprays)
+# Each cell of the matrix shows the confidence that the row group
+# is greater than the column group.
+   {m = match.call()
+    g = as.factor(eval(m$g, data, parent.frame()))
+    y = eval(m$y, data, parent.frame())
+
+    groups = names(sort(dec = T, tapply(y, g, f)))
+    scores = simplify2array(tapply(y, g, function(v)
+        replicate(n.replicates, f(sample(v, rep = T)))))
+    mat = sapply(groups[-1], function(g1)
+        sapply(head(groups, -1), function(g2)
+                mean(scores[,g2] > scores[,g1])))
+
+    mat[lower.tri(mat)] = NA
+    mat}
+
 posix.ct = function(n)
 # Converts a Unix time to a POSIXct.
     as.POSIXct(n, origin = "1970-1-1", tz = "UTC")
