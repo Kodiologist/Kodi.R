@@ -344,6 +344,15 @@ rnorm.f = function(n, mean = 0, sd = 1)
     {v = rnorm(n)
      (v - mean(v)) / sd(v) * sd + mean}
 
+norm.cond = function(val.known, corr, sd.known = 1, sd.unknown = 1)
+# Given jointly normal X, Y and a value 'x' of X,
+# 'norm.cond(x, cor(X, Y), sd(X), sd(Y))' gives the parameters
+# of the normally distribution variable Y|X = x. The formula is
+# from http://athenasc.com/Bivariate-Normal.pdf .
+    c(
+        mean = corr * val.known * sd.unknown / sd.known,
+        sd = sd.unknown * sqrt(1 - corr^2))
+
 rbeta.munu = rbeta.munu = function(n, mu, nu)
     rbeta(n, mu * nu, (1 - mu) * nu)
 
