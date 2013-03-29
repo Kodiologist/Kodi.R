@@ -787,21 +787,21 @@ density.addbw = function(x, bw)
 
 compare.mle = function(x, f, start, fixed = punl(), xlim)
 # Examples:
-#   plot.mle(rnorm(100), dnorm, list(mean = 0, sd = 1), xlim = c(-3, 3))
-#   plot.mle(rbeta(100, 10, 2), dbeta, list(shape1 = 1, shape2 = 1), xlim = c(0, 1))
+#   compare.mle(rnorm(100), dnorm, list(mean = 0, sd = 1), xlim = c(-3, 3))
+#   compare.mle(rbeta(100, 10, 2), dbeta, list(shape1 = 1, shape2 = 1), xlim = c(0, 1))
 # The first argument of 'f' must be the data argument (where you'd
 # plug in 'x').
    {# Construct 'fit.f'.
-    fit.f = function() -sum(X)
+    fit.f = function() {}
     formals(fit.f) = formals(f)[-1]
-    if ("log" %in% names(formals(f)))
-       {formals(fit.f)$log = T}
+    expr = bq(
+        f(x, .(REST)),
+        list(REST = lapply(names(formals(f)), as.name)[-1]))
+    if ("log" %in% names(formals(fit.f)))
+        formals(fit.f)$log = T
     else
-       {body(fit.f) = splice.into.expr(body(fit.f), list(
-            X = quote(log(X))))}
-    body(fit.f) = splice.into.expr(body(fit.f), list(
-        X = as.call(c(list(quote(f)),
-            c(list(quote(x)), lapply(names(formals(f)), as.name)[-1])))))
+        expr = bq(log(.(expr)))
+    body(fit.f) = bq(-sum(.(expr)))
 
     # Compute and print the MLEs.
     fit = suppressWarnings(mle(fit.f,
