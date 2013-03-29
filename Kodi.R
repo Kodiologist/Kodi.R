@@ -66,12 +66,24 @@ ccall = function(x, ...)
 bq = function(expr, where = parent.frame())
 # 'bquote' with a few extensions:
 # 1. 'where' can be a list.
-# 2. If the value of a period-expression is a list or a
+# 2. Expressions quoted with plyr::. (class "quoted") are treated
+#    correctly.
+# 3. If the value of a period-expression is a list or a
 #    curly-braced call, it's spliced into the parent construct:
 #      > bq(f(a, .(X), d), list(X = list(quote(b), quote(c))))
 #      f(a, b, c, d)
+#      > library(plyr)
+#      > bq(f(a, .(X), d), list(X = .(b, c)))
+#      f(a, b, c, d)
 #      > bq({f(); .(X); i();}, list(X = quote({g(); h();})))
 #      {f(); g(); h(); i();}
+#      > bq({f(); .(X); i();}, list(X = .(g(), h())))
+#      {f(); g(); h(); i();}
+#      > bq({f(); .(X); i();}, list(X = .({g(); h();})))
+#      {f(); g(); h(); i();}
+#   Note from the last example that a redundant pair of braces
+#   inside plyr::. is ignored. This makes it convenient to quote
+#   groups of statements.
    {if (is.list(where))
         where = as.environment(where)
     f = function(e)
@@ -81,6 +93,9 @@ bq = function(expr, where = parent.frame())
            {v = eval(e[[2]], where)
             if (typeof(v) == "language" && v[[1]] == quote(`{`))
                 as.list(v)[-1]
+            else if (inherits(v, "quoted") &&
+                    typeof(v[[1]]) == "language" && v[[1]][[1]] == quote(`{`))
+                as.list(v[[1]])[-1]
             else
                 v}
         else if (e[[1]] == quote(`function`))
