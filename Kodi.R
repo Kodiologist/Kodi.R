@@ -7,6 +7,10 @@ library(grid) # For "unit"
 # Miscellany
 # --------------------------------------------------
 
+MS = function()
+# The missing symbol ( http://stackoverflow.com/questions/3892580 )
+    substitute()
+
 gimme = function(x)
 # Like dput, but without the extra newlines.
   {cat(deparse(x))
@@ -58,6 +62,37 @@ ccall = function(x, ...)
 #   ccall(as.call(list(quote(f), quote(a), quote(b))), quote(c)) =>
 #   f(a, b, c)
    {as.call(c(as.list(x), ...))}
+
+bq = function(expr, where = parent.frame())
+# 'bquote' with a few extensions:
+# 1. 'where' can be a list.
+# 2. If the value of a period-expression is a list or a
+#    curly-braced call, it's spliced into the parent construct:
+#      > bq(f(a, .(X), d), list(X = list(quote(b), quote(c))))
+#      f(a, b, c, d)
+#      > bq({f(); .(X); i();}, list(X = quote({g(); h();})))
+#      {f(); g(); h(); i();}
+   {if (is.list(where))
+        where = as.environment(where)
+    f = function(e)
+        if (length(e) <= 1)
+            e
+        else if (e[[1]] == quote(.))
+           {v = eval(e[[2]], where)
+            if (typeof(v) == "language" && v[[1]] == quote(`{`))
+                as.list(v)[-1]
+            else
+                v}
+        else if (e[[1]] == quote(`function`))
+           {vassign(.(name, args, body, srcref), e)
+            as.call(list(
+                name,
+                as.pairlist(lapply(args, f)),
+                as.call(as.list(unlist(recursive = F, lapply(body, f)))),
+                srcref))}
+        else
+            as.call(as.list(unlist(recursive = F, lapply(e, f))))
+    f(substitute(expr))}
 
 splice.into.expr = function(expr, l)
 # Similar to `substitute`, but substitutions of curly-delimited
