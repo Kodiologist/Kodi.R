@@ -109,54 +109,6 @@ bq = function(expr, where = parent.frame())
             as.call(as.list(unlist(recursive = F, lapply(e, f))))
     f(substitute(expr))}
 
-splice.into.expr = function(expr, l)
-# Similar to `substitute`, but substitutions of curly-delimited
-# blocks are spliced into the outer construct. Also, the arguments
-# to `splice.into.expr` are evaluated.
-#   splice.into.expr(
-#      expr = quote(
-#         {a = 1
-#          if (q == x)
-#             {b = 1
-#              FOO
-#              y = 1}
-#          z = 1}),
-#      l = list(FOO = quote(
-#         {g = 2
-#          h = 2})))
-#    =>
-#      {a = 1
-#       if (q == x)
-#          {b = 1
-#           g = 2
-#           h = 2
-#           y = 1}
-#       z = 1}
-   {if (typeof(expr) == "symbol")
-       {name = as.character(expr)
-        if (name %in% names(l))
-           if (typeof(l[[name]]) == "language" &&
-                   identical(l[[name]][[1]], quote(`{`)))
-               as.list(l[[name]])[-1]
-           else
-               l[[name]]
-        else
-           expr}
-    else if (typeof(expr) == "language")
-      {head = splice.into.expr(expr[[1]], l)
-       tail = Reduce(c, lapply(as.list(expr)[-1], function(x)
-           if (identical(x, substitute()))
-             # We have to take a bit of extra care with the
-             # missing symbol.
-             # http://stackoverflow.com/questions/3892580
-               list(substitute())
-           else
-              {v = splice.into.expr(x, l)
-               if (typeof(v) == "list") v else list(v)}))
-       as.call(c(list(head), tail))}
-    else
-       expr}
-
 defmacroq = function(..., expr)
 # 'gtools::defmacro' (2.7.0, LGPL 2.1), but the final constructed
 # expression is returned in quoted form instead of evaluated.
