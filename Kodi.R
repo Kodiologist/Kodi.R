@@ -835,18 +835,13 @@ compare.mle = function(x, f, start, fixed = punl(), xlim)
 # MCMC
 # --------------------------------------------------
 
-as.bugs.model = function(expr, ...)
+as.bugs.model = function(expr, where = parent.frame())
 # So you can put BUGS models in your source code without quoting
-# them. Extra arguments are named substitutions:
-#   as.bugs.model({y <- FOO + 5}, FOO = 10)
-#   => "model {\n    y <- 10 + 5\n}"
-# `splice.into.expr` is used, so you can substitute in multiple
-# statements like so:
-#   as.bugs.model({f(); FOO; g();}, FOO = quote({h(); i();}))
-#   => "model {\n    f()\n    h()\n    i()\n    g()\n}"
+# them. Effectively, it calls 'bq', stringifies the result,
+# and prepends "model ".
   {m = match.call()
    "model " %.% paste(collapse = "\n", deparse(
-       splice.into.expr(m$expr, list(...))))}
+       do.call(bq, list(m$expr, where))))}
 
 dbeta.munu = defmacroq(mu, nu, expr =
     dbeta(mu * nu, (1 - mu) * nu))
