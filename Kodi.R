@@ -880,7 +880,7 @@ multijags = function(
 
 coda.qmean = function(mcmc.list, true.vals = NULL)
   {m = signif(digits = 3, mapcols(
-       do.call(rbind, mcmc.list), qmean))
+       do.call(rbind, mcmc.list), qmean))[3:1,]
    if (!is.null(true.vals))
       {m = rbind(
            m[c("hi", "mean"),],
