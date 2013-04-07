@@ -339,6 +339,9 @@ scale01 = function(v)
    {r = range(v)
     (v - r[1])/(r[2] - r[1])}
 
+rlunif = function(n, min = 1e-10, max = 1)
+   exp(runif(n, log(min), log(max)))
+
 rnorm.f = function(n, mean = 0, sd = 1)
 # Like rnorm, but the vector is scaled and shifted to have exactly
 # the requested sample mean and unbiased estimator of the
