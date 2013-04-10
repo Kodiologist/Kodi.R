@@ -907,15 +907,7 @@ coda.check = function(samp, vstr, actual = NULL, sorted = F, xlab = NULL)
         function(v) quantile(v, c(.025, .25, .5, .75, .975)))))
     names(d) = qw(lo, midlo, mid, midhi, hi)
     if (!is.null(actual))
-       {d$actual = actual
-        with(d, message(sprintf("The 95%% posterior intervals have %d%% coverage (%d of %d)",
-            round(100 * mean(actual >= lo & actual <= hi)),
-            sum(actual >= lo & actual <= hi),
-            nrow(d))))
-        with(d, message(sprintf("The 50%% posterior intervals have %d%% coverage (%d of %d)",
-            round(100 * mean(actual >= midlo & actual <= midhi)),
-            sum(actual >= midlo & actual <= midhi),
-            nrow(d))))}
+        d$actual = actual
     d$obs =
        (if (sorted)
             rank((if (is.null(actual)) d$mid else actual), ties.method = "first")
@@ -925,14 +917,25 @@ coda.check = function(samp, vstr, actual = NULL, sorted = F, xlab = NULL)
             factor(vstr, levels = vstr)
         else
             1 : nrow(d))
-    ggplot(data = d) +
+    l = list(plot = ggplot(data = d) +
         geom_crossbar(aes(x = obs, y = mid, ymin = midlo, ymax = midhi, group = obs),
                color = NA, fill = "blue", alpha = .1) +
         geom_crossbar(aes(x = obs, y = mid, ymin = lo, ymax = hi, group = obs)) +
         (if (is.null(actual)) geom_blank() else geom_point(aes(x = obs, y = actual),
             color = "red")) +
         ylab("predicted") + xlab("observation") +
-        no.gridlines()}
+        no.gridlines())
+    if (!is.null(actual))
+        l$msg = with(d, sprintf("%s\n%s\n",
+            sprintf("The 95%% posterior intervals have %d%% coverage (%d of %d)",
+                round(100 * mean(actual >= lo & actual <= hi)),
+                sum(actual >= lo & actual <= hi),
+                nrow(d)),
+            sprintf("The 50%% posterior intervals have %d%% coverage (%d of %d)",
+                round(100 * mean(actual >= midlo & actual <= midhi)),
+                sum(actual >= midlo & actual <= midhi),
+                nrow(d))))
+    l}
 
 standardize.stan.code = function(stan.code)
 # Remove comments and reduce whitespace.
