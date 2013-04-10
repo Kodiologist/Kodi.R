@@ -1186,6 +1186,11 @@ org.write.table = function(x, na = "NA", ...)
       {x = round(digits = 2, x$psrf[, "Upper C.I.", drop = F])
        dimnames(x)[[1]] = sprintf("`%s`", dimnames(x)[[1]])
        utils::write.table(format(x, drop0trailing = F), na = "", ...)}
+    else if (is.vector(x, "character") & length(x) == 1 & grep("\n$", x))
+      {d = data.frame(x = strsplit(x, "\n")[[1]])
+       attr(d, "row.names") = c("", "")
+       names(d) = ""
+       utils::write.table(d, ...)}
     else if ((is.numeric(x) || is.factor(x)) && (is.null(dim(x)) || length(dim(x)) == 1))
        utils::write.table(
            format(drop0trailing = F,
