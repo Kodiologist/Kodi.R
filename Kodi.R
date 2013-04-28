@@ -40,11 +40,18 @@ showexprs = function(...)
         {val = eval(expr, parent.frame())
          message(deparse(expr), " = ", val)}}
 
-show.caches = function(path = ".")
+show.caches = function(path = ".", keys = c("timestamp", "comment"))
 # Use interactively in an R.cache directory to peek at its
 # contents.
-   {do.call(rbind, lapply(list.files(path, full.names = T), function(name)
-        data.frame(name, readCacheHeader(name))))}
+   {l = list.files(path, full.names = T)
+    l = `names<-`(lapply(l, readCacheHeader), l)
+    l = l[order(sapply(l, function(x) x$timestamp))]
+    for (file in names(l))
+       {message(file)
+        for (k in (if (is.null(keys)) names(l[[file]]) else keys))
+            message(sprintf("%s: %s", k,
+                sub("[[:space:]]+$", "", l[[file]][[k]])))
+        message("")}}
 
 setup.cluster = function()
 # Make a default parallel cluster if there isn't one already.
