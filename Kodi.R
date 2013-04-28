@@ -369,6 +369,17 @@ norm.cond = function(val.known, corr, sd.known = 1, sd.unknown = 1)
         mean = corr * val.known * sd.unknown / sd.known,
         sd = sd.unknown * sqrt(1 - corr^2))
 
+bernbeta = function(y, prior.shape1 = 1, prior.shape2 = 1) c(
+# Given some Bernoulli-distributed data 'y' and a prior beta
+# distribution on the parameter of the Bernoulli distribution,
+# gives the parameters of the posterior beta distribution.
+    shape1 = sum(y) + prior.shape1,
+    shape2 = sum(!y) + prior.shape2)
+
+bernbeta.mean = function(y, prior.shape1 = 1, prior.shape2 = 1)
+# The mean of said posterior distribution.
+    (sum(y) + prior.shape1) / (length(y) + prior.shape1 + prior.shape2)
+
 rbeta.munu = rbeta.munu = function(n, mu, nu)
     rbeta(n, mu * nu, (1 - mu) * nu)
 
