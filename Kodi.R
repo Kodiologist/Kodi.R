@@ -226,6 +226,10 @@ modnames = function(x, ...)
        `names<-`(names(c(...)), c(...))[names(x)],
        names(x)))
 
+revn = function(v)
+# revn(c(a = "A", b = "B")) => c(A = "a", B = "b")
+    `names<-`(names(v), v)
+
 # --------------------------------------------------
 # Lists
 # --------------------------------------------------
@@ -516,6 +520,18 @@ reprows = function(m, ...)
 
 samprows = function(m, n, replace = F)
     m[sample.int(nrow(m), n, replace),]
+
+prop.ranks = function(m, greater = F)
+# Similar to 'boot.ranks', but takes a matrix, and computes the
+# proportion of times the value in each column is greater than
+# the value in each other column.
+   {cols = colnames(m)[order(colMeans(m), decreasing = greater)]
+    mat = sapply(cols[-1], function(c1)
+        sapply(head(cols, -1), function(c2)
+            mean(sign(m[,c2] - m[,c1]) ==
+                if (greater) 1 else -1)))
+    mat[lower.tri(mat)] = NA
+    mat}
 
 dist.idx = function(d, i)
 # Given a dist object and indices into its vector, returns
