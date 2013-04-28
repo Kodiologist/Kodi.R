@@ -901,15 +901,21 @@ multijags = function(
                 progress.bar = ifelse(quiet, "none", "text"))
             list(data = data, samp = samp)}})}
 
+stan.qmean = function(extracted, true.vals = NULL)
+   show.qmeans(true.vals = true.vals, sapply(extracted, qmean))
+
 coda.qmean = function(mcmc.list, true.vals = NULL)
-  {m = signif(digits = 3, mapcols(
-       do.call(rbind, mcmc.list), qmean))[3:1,]
-   if (!is.null(true.vals))
-      {m = rbind(
-           m[c("hi", "mean"),],
-           true = as.numeric(true.vals[dimnames(m)[[2]]]),
-           m["lo",, drop = F])}
-   as.data.frame(m)}
+   show.qmeans(true.vals = true.vals, mapcols(
+        do.call(rbind, mcmc.list), qmean))
+
+show.qmeans = function(m, true.vals = NULL)
+   {m = signif(m[3:1,], 3)
+    if (!is.null(true.vals))
+       {m = rbind(
+             m[c("hi", "mean"),],
+             true = as.numeric(true.vals[dimnames(m)[[2]]]),
+             m["lo",, drop = F])}
+    as.data.frame(m)}
 
 coda.vars = function(samp, str)
 # 'coda.vars(samp, "rho")' gets all the parameter names in the
