@@ -1254,7 +1254,7 @@ cache = function(cache.key, v, cache.dirs = default.cache.dirs, comment = NULL, 
    {cached.v = loadCache(cache.key, dirs = cache.dirs)
     if (bypass || is.null(cached.v))
        {force(v)
-        saveCache.default(v, cache.key, dirs = cache.dirs,
+        saveCache(v, cache.key, dirs = cache.dirs,
             comment = comment)
         v}
     else
