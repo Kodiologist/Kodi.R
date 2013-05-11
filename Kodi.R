@@ -513,10 +513,12 @@ fframe = function(...)
 # → data.frame(f = factor(c(1, 1, 1, 1, 2, 2, 2, 3, 3)),
 #              v = c("a", "b", "c", "b", "q", "c", "p", "q", "r"))
 # Useful for functions that want formulae, and for ggplot.
+# You can name the factor levels by using named arguments:
+#   fframe(a = 1:7, b = 3:10)
    {library(reshape2)
     a = melt(list(...))
     a[c(2, 1)] = a[c(1, 2)]
-    a[[1]] = factor(a[[1]])
+    a[[1]] = factor(a[[1]], levels = unique(a[[1]]))
     names(a) = c("f", "v")
     a}
 
