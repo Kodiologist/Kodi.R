@@ -1150,7 +1150,8 @@ tversky.mortality = function(db.path)
 ksource.envs = `names<-`(list(), character())
 
 ksource = function(expr, text, file, 
-        ename = (if (missing(file)) "generic" else dirname(file)))
+        ename = (if (missing(file)) "generic" else dirname(file)),
+        chdir = T)
 # Like 'source' and 'eval' but with better containment.
 # '.GlobalEnv' is hidden, and only packages loaded with 'library'
 # while inside the local environment are visible. This is
@@ -1177,7 +1178,7 @@ ksource = function(expr, text, file,
     if (sum(c(!missing(file), !missing(expr), !missing(text))) != 1)
         stop("Exactly one must be provided among file, expr, text")
     if (!missing(file))
-        v = source(file, local = e)
+        v = source(file, local = e, chdir = chdir)
     else if (!missing(expr))
         v = eval(expr, envir = e)
     else # !missing(text)
