@@ -1230,7 +1230,7 @@ org.write.table = function(x, na = "NA", ...)
        utils::write.table(data.frame(count = x), na = "", ...)}
     else if (inherits(x, "gelman.diag"))
       {x = round(digits = 2, x$psrf[, "Upper C.I.", drop = F])
-       dimnames(x)[[1]] = sprintf("`%s`", dimnames(x)[[1]])
+       dimnames(x)[[1]] = sprintf("~%s~", dimnames(x)[[1]])
        utils::write.table(format(x, drop0trailing = F), na = "", ...)}
     else if (is.vector(x, "character") && length(x) == 1 && grepl("\n$", x))
       {d = data.frame(x = strsplit(x, "\n")[[1]])
