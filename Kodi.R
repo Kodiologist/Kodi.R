@@ -12,9 +12,24 @@ MS = function()
     substitute()
 
 gimme = function(x)
-# Like dput, but without the extra newlines.
-  {cat(deparse(x))
-   cat("\n")}
+# A prettier dput.
+   {cat(gimme.char(x))}
+gimme.char = function(x, indent = "")
+   {newindent = paste0(indent, "    ")
+    if (is.data.frame(x))
+        sprintf("%sdata.frame(\n%s)\n", indent, paste(collapse = ",\n", 
+          c((if (identical(row.names(x), char(1 : nrow(x))))
+              char()
+            else
+              sprintf('%srow.names = %s', newindent, gimme.char(row.names(x)))),
+            sapply(1 : ncol(x), function(cn) sprintf("%s%s = %s",
+                newindent, names(x)[cn], gimme.char(x[,cn]))))))
+    else if (is.ordered(x))
+        sprintf("ordered(%s, levels = %s)", gimme.char(char(x)), gimme.char(levels(x)))
+    else if (is.factor(x))
+        sprintf("factor(%s, levels = %s)", gimme.char(char(x)), gimme.char(levels(x)))
+    else
+        paste(collapse = "", deparse(x))}
 
 vassign = function(vars, values, envir = parent.frame())
 # vassign(.(a, b), c(1, 2)) is equivalent to {a = 1; b = 2;}.
