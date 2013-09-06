@@ -549,7 +549,7 @@ ss = subset
 reprows = function(m, ...)
     m[rep(1 : nrow(m), ...),]
 
-samprows = function(m, n, replace = F)
+samprows = function(m, n = nrow(m), replace = F)
     m[sample.int(nrow(m), n, replace),]
 
 prop.ranks = function(m, greater = F)
