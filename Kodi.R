@@ -844,6 +844,24 @@ compare.mle = function(x, f, start, fixed = punl(), xlim)
 # MCMC
 # --------------------------------------------------
 
+sim.y.mu.binomial = function(fit, predictors, n.sims = 100)
+    {library(arm)
+     sim.m = t(sim(fit, n.sims)@coef)
+     pred.m = sapply(rownames(sim.m), function(name)
+        if (name == "(Intercept)")
+            rep(1, nrow(predictors))
+        else if (name %in% colnames(predictors))
+            predictors[,name]
+        else if (all(strsplit(name, ":")[[1]] %in% colnames(predictors)))
+            apply(predictors[, strsplit(name, ":")[[1]]], 1, prod)
+        else
+            stop("Predictor not found for ", name))
+     result = fit$family$linkinv(pred.m %*% sim.m)
+     if (!is.null(rownames(predictors)) &&
+            !identical(rownames(predictors), as.character(1 : nrow(predictors))))
+        rownames(result) = rownames(predictors)
+     result}
+
 as.bugs.model = function(expr, where = parent.frame())
 # So you can put BUGS models in your source code without quoting
 # them. Effectively, it calls 'bq', stringifies the result,
