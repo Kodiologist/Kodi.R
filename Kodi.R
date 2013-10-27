@@ -844,8 +844,13 @@ compare.mle = function(x, f, start, fixed = punl(), xlim)
 # MCMC
 # --------------------------------------------------
 
-sim.y.mu.binomial = function(fit, predictors, n.sims = 100)
-    {library(arm)
+sim.y.mu = function(fit, predictors, n.sims = 100)
+# Known to work for 'lm' and 'glm(family = binomial)' objects
+# without extra error terms or random effects.
+#
+# Err, no, wait, this is just an approximation.
+    {if (identical(class(fit), "lm"))
+         fit = glm(fit)
      sim.m = t(sim(fit, n.sims)@coef)
      pred.m = sapply(rownames(sim.m), function(name)
         if (name == "(Intercept)")
