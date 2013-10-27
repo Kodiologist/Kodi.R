@@ -343,8 +343,8 @@ qmean = function(v)
    {qs = as.vector(quantile(v, c(.025, .975)))
     c(lo = qs[1], mean = mean(v), hi = qs[2])}
 
-mad1 = function(v, na.rm = FALSE)
-    mad(v, na.rm, constant = 1)
+mad1 = function(x, na.rm = FALSE)
+    mad(x = x, na.rm = na.rm, constant = 1)
 
 sa0 = function(v)
     seq_along(v) - 1
