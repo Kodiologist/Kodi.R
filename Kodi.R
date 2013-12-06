@@ -55,6 +55,16 @@ showexprs = function(...)
         {val = eval(expr, parent.frame())
          message(deparse(expr), " = ", val)}}
 
+rd = function(x, digits = 3)
+# Round for display.
+   {if (is.data.frame(x))
+       {for (i in seq_along(x))
+            if (is.numeric(x[,i]))
+                x[,i] = round(x[,i], digits)
+        x}
+    else
+        round(x, digits)}
+
 show.caches = function(path = ".", keys = c("timestamp", "comment"))
 # Use interactively in an R.cache directory to peek at its
 # contents.
