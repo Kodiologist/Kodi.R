@@ -744,7 +744,7 @@ plotfuns = function(fs, xrange, yrange, n = 101)
         scale_y_continuous(name = "", expand = c(0, 0)) +
         coord_cartesian(xlim = xrange, ylim = yrange)}
 
-dodge = function(x, y, faceter = NULL, data = NULL, discrete = F)
+dodge = function(x, y, faceter = NULL, data = NULL, discrete = F, stack.width = 5)
    {m = match.call()
     x = as.factor(eval(m$x, data, parent.frame()))
     y.orig = eval(m$y, data, parent.frame())
@@ -755,7 +755,7 @@ dodge = function(x, y, faceter = NULL, data = NULL, discrete = F)
     xr = rng(as.numeric(x))
     xincr = (if (xr == 0) 1 else xr) / 50 * length(unique(faceter))
     df = if (discrete)
-        dodge.offsets.discrete(x, y, faceter, 5, xincr, rng(y)/100) else
+        dodge.offsets.discrete(x, y, faceter, stack.width, xincr, rng(y)/100) else
         dodge.offsets.continuous(x, y, faceter, xincr, rng(y)/100)
     p = qplot(x, y, data = df, geom = "blank") +
         geom_point(aes(
