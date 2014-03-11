@@ -367,6 +367,10 @@ qmean = function(v)
    {qs = as.vector(quantile(v, c(.025, .975)))
     c(lo = qs[1], mean = mean(v), hi = qs[2])}
 
+mhilo = function(v)
+   {qs = as.vector(quantile(v, c(.025, .5, .975)))
+    c(lo = qs[1], med = qs[2], hi = qs[3])}
+
 mad1 = function(x, na.rm = FALSE)
     mad(x = x, na.rm = na.rm, constant = 1)
 
