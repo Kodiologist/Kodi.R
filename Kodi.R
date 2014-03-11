@@ -239,6 +239,14 @@ which.idx = function(whence, v)
    else
       stop("non-character v not implemented")}
 
+which.min.hastie = function(x)
+# Index of the first value within 1 SD of the minimum.
+    which(x <= min(x) + sd(x))[1]
+
+which.max.hastie = function(x)
+# Index of the first value within 1 SD of the maximum.
+    which(x >= max(x) - sd(x))[1]
+
 pick = function(v, size = 1, ...)
 # Like sample, but without surprising behavior when length(v) == 1
 # and with size defaulting to 1.
@@ -254,6 +262,12 @@ modnames = function(x, ...)
 revn = function(v)
 # revn(c(a = "A", b = "B")) => c(A = "a", B = "b")
     `names<-`(names(v), v)
+
+ncase = function(x)
+    if (is.null(nrow(x))) length(x) else nrow(x)
+
+select.cases = function(x, i)
+    if (is.null(nrow(x))) x[i] else x[i,, drop = F]
 
 # --------------------------------------------------
 # Lists
@@ -849,6 +863,70 @@ compare.mle = function(x, f, start, fixed = punl(), xlim)
         geom_densitybw(aes(x)) +
         stat_function(fun = f, arg = arg, color = "blue") +
         scale_x_continuous(limits = xlim, expand = c(0, 0))}
+
+# --------------------------------------------------
+# Prediction
+# --------------------------------------------------
+
+crossvalid = function(iv, dv, nfold = 10, folds, f)
+# Do cross-validation.
+#
+# 'iv' and 'dv' can be data frames or matrices (in which case
+# each row is considered to be a case) or plain vectors. 'f'
+# should have parameters 'train.iv', 'train.dv', and 'test.iv'
+# and should return results with the same number of cases as
+# 'test.iv' (typically, predictions for test.dv).
+#
+# Example:
+#   x = rnorm(50)
+#   y = x + rnorm(50, 0, .5)
+#   mean(abs(y - crossvalid(x, y, nfold = 10, f = function(x, y, x2) predict(lm(y ~ x), data.frame(x = x2)))))
+   {if (ncase(iv) != ncase(dv))
+       stop("iv and dv must have the same number of cases")
+    if (missing(folds))
+        folds = sample(rep_len(1 : nfold, ncase(iv)))
+    else
+        nfold = max(folds)
+    # Accumulate cross-validated predictions.
+    pred = lapply(1 : nfold, function(fold) f(
+        select.cases(iv, folds != fold),
+        select.cases(dv, folds != fold),
+        select.cases(iv, folds == fold)))
+    # Return 'pred' in the original order of cases used by
+    # 'iv' and 'dv'.
+    perm = order(c(recursive = T,
+        lapply(1 : nfold, function(fold) which(folds == fold))))
+    if (is.null(nrow(pred)[[1]]))
+        unlist(pred)[perm]
+    else
+        do.call(rbind, pred)[perm,]}
+
+crossvalid.p = function(iv, dv, p, nfold = 10, folds, f, assess)
+# For each case in 'p', produces 'assess(pred, dv)', where 'pred'
+# is from 'crossvalid' with 'iv', 'dv', 'nfold', and 'f'. 'f'
+# should have an extra parameter (compared to the 'f' of
+# 'crossvalid'), which will be assigned to the current case of
+# 'p'. The intended use of this function is to tune parameters.
+#
+# For maximum comparability, we use the same folds for every
+# case of 'p'.
+   {if (missing(folds))
+        folds = sample(rep_len(1 : nfold, ncase(iv)))
+    sapply(1 : ncase(p), function(p.i)
+       {pred = crossvalid(iv, dv, folds = folds, f = function(train.iv, train.dv, test.iv)
+            do.call(f, c(
+                list(train.iv, train.dv, test.iv),
+                select.cases(p, p.i))))
+        assess(pred, dv)})}
+
+knn.autok = function(train, test, cl, k.candidates = 1:20, nfold = 10, ...)
+# Like 'class::knn', but 'k' is picked by cross-validation.
+   {k = which.max.hastie(crossvalid.p(train, cl, p = k.candidates, nfold = nfold,
+        f = function(train.iv, train.dv, test.iv, k)
+            class::knn(train.iv, test.iv, train.dv, k = k, ...),
+        assess = function(pred, obs) mean(pred == obs)))
+    #message("knn.autok: Chose k = ", k)
+    class::knn(train, test, cl, k = k, ...)}
 
 # --------------------------------------------------
 # MCMC
