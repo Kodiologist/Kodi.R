@@ -1385,11 +1385,19 @@ org.write.table = function(x, na = "NA", ...)
            na = na,
            ...)
     else if (is.data.frame(x) || is.matrix(x))
-      {t = format(x, drop0trailing = F)
+      {t = format(org.format.logical.cols(x), drop0trailing = F)
        t[is.na(x)] = ""
        utils::write.table(t, ...)}
     else
        utils::write.table(x, na = "", ...)}
+
+org.format.logical.cols = function(m)
+   {for (i in seq_len(ncol(m)))
+       {if (is.logical(m[,i]))
+            m[,i] = logi2factor(m[,i], c(
+                "[[cls:boolean-false][FALSE]]",
+                "[[cls:boolean-true][TRUE]]"))}
+    m}
 
 default.cache.dirs = c("Kodi", "adhoc")
 
