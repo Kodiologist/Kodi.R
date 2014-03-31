@@ -263,9 +263,6 @@ revn = function(v)
 # revn(c(a = "A", b = "B")) => c(A = "a", B = "b")
     `names<-`(names(v), v)
 
-ncase = function(x)
-    if (is.null(nrow(x))) length(x) else nrow(x)
-
 select.cases = function(x, i)
     if (is.null(nrow(x))) x[i] else x[i,, drop = F]
 
@@ -885,10 +882,10 @@ crossvalid = function(iv, dv, nfold = 10, folds, f)
 #   x = rnorm(50)
 #   y = x + rnorm(50, 0, .5)
 #   mean(abs(y - crossvalid(x, y, nfold = 10, f = function(x, y, x2) predict(lm(y ~ x), data.frame(x = x2)))))
-   {if (ncase(iv) != ncase(dv))
+   {if (NROW(iv) != NROW(dv))
        stop("iv and dv must have the same number of cases")
     if (missing(folds))
-        folds = sample(rep_len(1 : nfold, ncase(iv)))
+        folds = sample(rep_len(1 : nfold, NROW(iv)))
     else
         nfold = max(folds)
     # Accumulate cross-validated predictions.
@@ -915,8 +912,8 @@ crossvalid.p = function(iv, dv, p, nfold = 10, folds, f, assess)
 # For maximum comparability, we use the same folds for every
 # case of 'p'.
    {if (missing(folds))
-        folds = sample(rep_len(1 : nfold, ncase(iv)))
-    sapply(1 : ncase(p), function(p.i)
+        folds = sample(rep_len(1 : nfold, NROW(iv)))
+    sapply(1 : NROW(p), function(p.i)
        {pred = crossvalid(iv, dv, folds = folds, f = function(train.iv, train.dv, test.iv)
             do.call(f, c(
                 list(train.iv, train.dv, test.iv),
