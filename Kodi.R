@@ -923,7 +923,7 @@ crossvalid.p = function(iv, dv, p, nfold = 10, folds, f, assess)
                 select.cases(p, p.i))))
         assess(pred, dv)})}
 
-knn.autok = function(train, test, cl, k.candidates = 1:20, nfold = 10, ...)
+knn.autok = function(train, test, cl, k.candidates = 1 : min(20, floor(length(cl)/2)), nfold = 10, ...)
 # Like 'class::knn', but 'k' is picked by cross-validation.
    {k = which.max.hastie(crossvalid.p(train, cl, p = k.candidates, nfold = nfold,
         f = function(train.iv, train.dv, test.iv, k)
