@@ -907,8 +907,8 @@ crossvalid = function(iv, dv, nfold = 10, folds, f)
 
 crossvalid.p = function(iv, dv, p, nfold = 10, folds, f, assess)
 # For each case in 'p', produces 'assess(pred, dv)', where 'pred'
-# is from 'crossvalid' with 'iv', 'dv', 'nfold', and 'f'. 'f'
-# should have an extra parameter (compared to the 'f' of
+# is from 'crossvalid' with 'iv', 'dv', 'nfold', 'fold', and 'f'.
+# 'f' should have an extra parameter (compared to the 'f' of
 # 'crossvalid'), which will be assigned to the current case of
 # 'p'. The intended use of this function is to tune parameters.
 #
