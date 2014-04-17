@@ -1354,7 +1354,7 @@ kenv = function(pattern)
     ksource.envs[[ename]]}
 
 # --------------------------------------------------
-# Org
+# Org (Daylight)
 # --------------------------------------------------
 
 org.write.table = function(x, na = "NA", ...)
@@ -1419,6 +1419,14 @@ mk.cached = function(cache.dirs = default.cache.dirs) function(v, override = NUL
         comment = paste("expr:", expr.str))}
 
 kodi.eval = function(expr, ename)
-   ksource(ename = ename, expr = substitute(
+    ksource(ename = ename, expr = substitute(
         with(withVisible(expr),
         if (visible) value else "")))
+
+daylight.autos = function(file)
+   {pf = parent.frame()
+    text = readChar(file, file.info(file)$size)
+    for (code in stringr::str_match_all(text, stringr::ignore.case(
+            "\n#\\+begin_src R :auto t\n(.+?\n)#\\+end_src"))[[1]][,2])
+        eval(parse(text = code), pf)
+    T}
