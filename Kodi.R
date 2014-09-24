@@ -1223,6 +1223,16 @@ unpack.tversky = function(db.path,
         s = ordered(tversky.sid(dlong$sn)),
         subset(dlong, select = -sn))
     dwide = ordf(dcast(dlong, s ~ k, value.var = "v"), s)
+    if (include.incomplete)
+      # Add rows of NAs for subjects who never got a D row.
+       {na.row = dwide[1,-1]
+        na.row[1,] = NA
+        new.sns = setdiff(row.names(subjects), char(dwide$s))
+        dwide = rbind(dwide, cbind(
+            s = new.sns,
+            na.row[rep(1, length(new.sns)),]))
+        dwide$s = ordered(dwide$s, levels = row.names(subjects))
+        dwide = ordf(dwide, s)}
     row.names(dwide) = dwide$s
 
     timing = ordf(
