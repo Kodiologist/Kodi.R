@@ -500,6 +500,25 @@ boot.ranks = function(y, g, data = NULL, n.replicates = 1e4,
     mat[lower.tri(mat)] = NA
     mat}
 
+discrete.hdi = function(v, p)
+# Highest-density interval for a discrete variable.
+# > x = rbinom(1000, 10, .9)
+# > discrete.hdi(x, .5)
+#   => list(lo = 8, hi = 9, coverage = .573)
+   {if (!is.integer(v)) stop()
+    vmin = min(v)
+    v = v - vmin + 1
+    t = tabulate(v)
+    d = ss(expand.grid(lo = 1 : max(v), hi = 1 : max(v)), lo <= hi)
+    d$coverage = sapply(1 : nrow(d),
+        function(i) sum(t[d[i, "lo"] : d[i, "hi"]]) / length(v))
+    d = ss(d, coverage >= p)
+    d = ordf(d, hi - lo, -coverage, abs(lo - (max(v) + 1)/2), lo)[1,]
+    list(
+        lo = d$lo - 1 + vmin,
+        hi = d$hi - 1 + vmin,
+        coverage = d$coverage)}
+
 posix.ct = function(n)
 # Converts a Unix time to a POSIXct.
     as.POSIXct(n, origin = "1970-1-1", tz = "UTC")
