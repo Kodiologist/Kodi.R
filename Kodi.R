@@ -1435,15 +1435,15 @@ cache = function(cache.key, v, cache.dirs = default.cache.dirs, comment = NULL, 
             comment = comment)
         v}
     else
-       cached.v}
+        cached.v}
 
-mk.cached = function(cache.dirs = default.cache.dirs) function(v, override = NULL)
+mk.cached = function(cache.dirs = default.cache.dirs) function(v, bypass = F, override = NULL)
    {m = match.call()
     expr.str = paste(deparse(m$v), collapse = " ")
     cache(
         cache.key = list(expr = expr.str),
         v = if (!is.null(override)) override else v,
-        bypass = !is.null(override),
+        bypass = bypass || !is.null(override),
         cache.dirs = cache.dirs,
         comment = paste("expr:", expr.str))}
 
