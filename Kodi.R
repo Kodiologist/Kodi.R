@@ -1455,7 +1455,7 @@ kodi.eval = function(expr, ename)
 daylight.autos = function(file)
    {pf = parent.frame()
     text = readChar(file, file.info(file)$size)
-    for (code in stringr::str_match_all(text, stringr::ignore.case(
+    for (code in stringr::str_match_all(text, stringr::regex(ignore_case = T,
             "\n#\\+begin_src R :auto t\n(.+?\n)#\\+end_src"))[[1]][,2])
         eval(parse(text = code), pf)
     T}
