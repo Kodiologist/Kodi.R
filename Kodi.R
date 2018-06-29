@@ -1273,6 +1273,9 @@ unpack.tversky = function(db.path,
         "hit", "asgmt", "worker",
         "task", "tv",
         "consented_t", "began_t", "completed_t")]
+
+    dbDisconnect(db)
+
     list(
         subjects = subjects,
         dlong = dlong,
