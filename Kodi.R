@@ -65,12 +65,14 @@ rd = function(x, digits = 3)
     else
         round(x, digits)}
 
-show.caches = function(path = ".", keys = c("timestamp", "comment"))
+show.caches = function(path = ".", keys = c("timestamp", "size", "comment"))
 # Use interactively in an R.cache directory to peek at its
 # contents.
    {l = list.files(path, full.names = T)
     l = `names<-`(lapply(l, readCacheHeader), l)
     l = l[order(sapply(l, function(x) x$timestamp))]
+    for (x in names(l))
+        l[[x]]$size = utils:::format.object_size(file.info(x)$size, "auto")
     for (file in names(l))
        {message(file)
         for (k in (if (is.null(keys)) names(l[[file]]) else keys))
