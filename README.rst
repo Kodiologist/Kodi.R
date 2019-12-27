@@ -11,7 +11,7 @@ Put ``options(Kodi.R.path = "/path/to/Kodi.R")`` in your own .Rprofile.
 License
 ============================================================
 
-This program is copyright 2013–2018 Kodi Arfer.
+This program is copyright 2013–2019 Kodi Arfer.
 
 This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
 
