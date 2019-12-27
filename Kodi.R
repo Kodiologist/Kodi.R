@@ -87,6 +87,29 @@ setup.cluster = function()
        setDefaultCluster(makeForkCluster(getOption("mc.cores", 2))))
     T}
 
+install.rec = function(pkg)
+# Install a package and reinstall any dependencies that need
+# to be reinstalled, recursively.
+# https://stackoverflow.com/a/58893973
+   {library(stringr)
+    while (T)
+       {message("INSTALLING: ", pkg)
+        out = system2("Rscript",
+            sprintf(
+                "-e \"install.packages('%s', repos='http://probability.ca/cran')\"",
+                pkg),
+            stdout=T, stderr=T)
+        p = str_match(
+           paste0(out, collapse = " "),
+           "package ‘(\\S+)’ was installed by an R version with different internals")[,2]
+        if (!is.na(p))
+           {message("START RECURSING: ", pkg, " - ", p)
+            install.rec(p)
+            message("END RECURSING: ", pkg, " - ", p)}
+        else
+            break}
+   message("DONE WITH: ", pkg)}
+
 # --------------------------------------------------
 # Metaprogramming
 # --------------------------------------------------
