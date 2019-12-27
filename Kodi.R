@@ -59,8 +59,8 @@ rd = function(x, digits = 3)
 # Round for display.
    {if (is.data.frame(x))
        {for (i in seq_along(x))
-            if (is.numeric(x[,i]))
-                x[,i] = round(x[,i], digits)
+            if (is.numeric(x[[i]]))
+                x[[i]] = round(x[[i]], digits)
         x}
     else
         round(x, digits)}
